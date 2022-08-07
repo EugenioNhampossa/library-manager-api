@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://vainilla_library:NTEn2gG75gRsWUY@51.38.103.233:3306/vainilla_biblioteca"
+}
+
+model Livro {
+  id           String       @unique @default(uuid())
+  titulo       String
+  autor        String
+  local        String
+  editora      String
+  ano          Int
+  edicao       Int
+  volume       Int
+  nrPaginas    Int
+  observacoes  String
+  dataRegistro DateTime     @default(now())
+  qtyStock     Int
+  Emprestimo   Emprestimo[]
+}
+
+model Funcionario {
+  id          String       @unique @default(uuid())
+  nome        String
+  apelido     String
+  nrBI        String
+  nomeUsuario String       @unique
+  senha       String
+  permissao   String
+  Emprestimo  Emprestimo[]
+}
+
+model Membro {
+  id         String       @unique @default(uuid())
+  nome       String
+  apelido    String
+  nrBI       String
+  eDocente   Boolean
+  Emprestimo Emprestimo[]
+}
+
+model Emprestimo {
+  id             String      @unique @default(uuid())
+  idLivro        String
+  idMembro       String
+  idFuncionario  String
+  dataEmprestimo DateTime    @default(now())
+  dataDevolucao  DateTime?
+  devolvido      Boolean     @default(false)
+  funcionario    Funcionario @relation(fields: [idFuncionario], references: [id])
+  livro          Livro       @relation(fields: [idLivro], references: [id])
+  membro         Membro      @relation(fields: [idMembro], references: [id])
+
+  @@unique([id, idLivro])
+  @@index([idFuncionario], map: "Emprestimo_idFuncionario_fkey")
+  @@index([idLivro], map: "Emprestimo_idLivro_fkey")
+  @@index([idMembro], map: "Emprestimo_idMembro_fkey")
+}
