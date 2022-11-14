@@ -3,10 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.operacoesMembro = void 0;
 const routes_1 = require("../routes");
 const prisma_1 = require("../prisma");
+
 function operacoesMembro() {
     routes_1.routes.post("/membro/registrar", async (req, res) => {
         const data = req.body;
-        console.log(data);
         try {
             const membro = await prisma_1.prisma.membro.create({
                 data: {
@@ -23,7 +23,6 @@ function operacoesMembro() {
         }
     });
     routes_1.routes.get("/membro/lista", async (req, res) => {
-        console.log(req);
         try {
             const getMembros = await prisma_1.prisma.membro.findMany({
                 orderBy: {

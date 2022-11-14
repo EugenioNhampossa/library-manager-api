@@ -6,7 +6,6 @@ const prisma_1 = require("../prisma");
 function operacoesLivro() {
     routes_1.routes.post("/livro/registrar", async (req, res) => {
         const data = req.body;
-        console.log(data);
         try {
             const livro = await prisma_1.prisma.livro.create({
                 data: {

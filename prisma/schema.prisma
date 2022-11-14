@@ -2,61 +2,143 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// datasource db {
+//   provider = "postgresql"
+//   url      = "postgresql://postgres:RvwKSCYrIzqhkB6u@db.xxegezshcrwjsilabhjn.supabase.co:5432/postgres"
+// }
 datasource db {
-  provider = "mysql"
-  url      = "mysql://vainilla_library:NTEn2gG75gRsWUY@51.38.103.233:3306/vainilla_biblioteca"
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
 }
 
 model Livro {
-  id           String       @unique @default(uuid())
+  id           String       @default(uuid())
   titulo       String
-  autor        String
-  local        String
-  editora      String
-  ano          Int
-  edicao       Int
-  volume       Int
+  idAutor      String
+  local        String?
+  idEditora    String
+  idCategoria  String
+  ano          Int?
+  edicao       Int?
+  volume       Int?
   nrPaginas    Int
   observacoes  String
   dataRegistro DateTime     @default(now())
-  qtyStock     Int
+  nrCopias     Int
+  editora      Editora      @relation(fields: [idEditora], references: [id])
+  categoria    Categoria    @relation(fields: [idCategoria], references: [id])
+  autor        Autor        @relation(fields: [idAutor], references: [id])
   Emprestimo   Emprestimo[]
+  Aquisicao    Aquisicao[]
+
+  @@unique([id])
+}
+
+model Autor {
+  id       String    @default(uuid())
+  nome     String
+  apelido  String
+  dataNasc DateTime?
+  Livro    Livro[]
+
+  @@unique([id])
+}
+
+model Categoria {
+  id        String  @default(uuid())
+  titulo    String  @unique
+  descricao String
+  Livro     Livro[]
+
+  @@unique([id])
+}
+
+model Editora {
+  id       String  @default(uuid())
+  nome     String  @unique
+  endereco String?
+  telefone String?
+  Livro    Livro[]
+
+  @@unique([id])
+}
+
+model Multa {
+  id         String       @default(uuid())
+  valor      Decimal
+  dataPag    DateTime?
+  Emprestimo Emprestimo[]
+
+  @@unique([id])
 }
 
 model Funcionario {
-  id          String       @unique @default(uuid())
-  nome        String
-  apelido     String
-  nrBI        String
-  nomeUsuario String       @unique
+  id         String       @default(uuid())
+  nome       String
+  apelido    String
+  nrBI       String       @unique
+  idUsuario  String
+  usuario    Usuario      @relation(fields: [idUsuario], references: [id])
+  Emprestimo Emprestimo[]
+  Aquisicao  Aquisicao[]
+
+  @@unique([id])
+}
+
+model Usuario {
+  id          String        @default(uuid())
+  nomeUsuario String        @unique
   senha       String
-  permissao   String
-  Emprestimo  Emprestimo[]
+  funcao      String
+  Membro      Membro[]
+  Funcionario Funcionario[]
+
+  @@unique([id])
+}
+
+model Aquisicao {
+  id            String      @default(uuid())
+  idFuncionario String
+  idLivro       String
+  nrCopias      Int
+  dataAquisicao DateTime    @default(now())
+  funcionario   Funcionario @relation(fields: [idFuncionario], references: [id])
+  livro         Livro       @relation(fields: [idLivro], references: [id])
+
+  @@unique([id])
 }
 
 model Membro {
-  id         String       @unique @default(uuid())
+  id         String       @default(uuid())
   nome       String
   apelido    String
-  nrBI       String
-  eDocente   Boolean
+  nrBI       String       @unique
+  idUsuario  String
+  usuario    Usuario      @relation(fields: [idUsuario], references: [id])
   Emprestimo Emprestimo[]
+
+  @@unique([id])
 }
 
 model Emprestimo {
-  id             String      @unique @default(uuid())
-  idLivro        String
-  idMembro       String
-  idFuncionario  String
-  dataEmprestimo DateTime    @default(now())
-  dataDevolucao  DateTime?
-  devolvido      Boolean     @default(false)
-  funcionario    Funcionario @relation(fields: [idFuncionario], references: [id])
-  livro          Livro       @relation(fields: [idLivro], references: [id])
-  membro         Membro      @relation(fields: [idMembro], references: [id])
+  id            String      @unique @default(uuid())
+  idLivro       String
+  idMembro      String
+  idFuncEmp     String
+  dataInicio    DateTime    @default(now())
+  dataFim       DateTime
+  dataDevolucao DateTime?
+  idFuncDev     String?
+  idMulta       String?
+  devolvido     Boolean     @default(false)
+  funcinonario  Funcionario @relation(fields: [idFuncEmp], references: [id])
+  multa         Multa?       @relation(fields: [idMulta], references: [id])
+  livro         Livro       @relation(fields: [idLivro], references: [id])
+  membro        Membro      @relation(fields: [idMembro], references: [id])
 
   @@unique([id, idLivro])
-  @@index([idFuncionario], map: "Emprestimo_idFuncionario_fkey")
-  @@index([idLivro], map: "Emprestimo_idLivro_fkey")
-  @@index([idMembro], map: "Emprestimo_idMembro_fkey")
 }

@@ -1,0 +1,137 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table Livro {
+  id String [unique, not null]
+  titulo String [not null]
+  idAutor String [not null]
+  local String
+  idEditora String [not null]
+  idCategoria String [not null]
+  ano Int
+  edicao Int
+  volume Int
+  nrPaginas Int [not null]
+  observacoes String [not null]
+  dataRegistro DateTime [default: `now()`, not null]
+  nrCopias Int [not null]
+  editora Editora [not null]
+  categoria Categoria [not null]
+  autor Autor [not null]
+  Emprestimo Emprestimo [not null]
+  Aquisicao Aquisicao [not null]
+}
+
+Table Autor {
+  id String [unique, not null]
+  nome String [not null]
+  apelido String [not null]
+  dataNasc DateTime
+  Livro Livro [not null]
+}
+
+Table Categoria {
+  id String [unique, not null]
+  titulo String [unique, not null]
+  descricao String [not null]
+  Livro Livro [not null]
+}
+
+Table Editora {
+  id String [unique, not null]
+  nome String [unique, not null]
+  endereco String
+  telefone String
+  Livro Livro [not null]
+}
+
+Table Multa {
+  id String [unique, not null]
+  valor Decimal [not null]
+  dataPag DateTime
+  Emprestimo Emprestimo [not null]
+}
+
+Table Funcionario {
+  id String [unique, not null]
+  nome String [not null]
+  apelido String [not null]
+  nrBI String [unique, not null]
+  idUsuario String [not null]
+  usuario Usuario [not null]
+  Emprestimo Emprestimo [not null]
+  Aquisicao Aquisicao [not null]
+}
+
+Table Usuario {
+  id String [unique, not null]
+  nomeUsuario String [unique, not null]
+  senha String [not null]
+  funcao String [not null]
+  Membro Membro [not null]
+  Funcionario Funcionario [not null]
+}
+
+Table Aquisicao {
+  id String [unique, not null]
+  idFuncionario String [not null]
+  idLivro String [not null]
+  nrCopias Int [not null]
+  dataAquisicao DateTime [default: `now()`, not null]
+  funcionario Funcionario [not null]
+  livro Livro [not null]
+}
+
+Table Membro {
+  id String [unique, not null]
+  nome String [not null]
+  apelido String [not null]
+  nrBI String [unique, not null]
+  idUsuario String [not null]
+  usuario Usuario [not null]
+  Emprestimo Emprestimo [not null]
+}
+
+Table Emprestimo {
+  id String [unique, not null]
+  idLivro String [not null]
+  idMembro String [not null]
+  idFuncEmp String [not null]
+  dataInicio DateTime [default: `now()`, not null]
+  dataFim DateTime [not null]
+  dataDevolucao DateTime
+  idFuncDev String
+  idMulta String
+  devolvido Boolean [not null, default: false]
+  funcinonario Funcionario [not null]
+  multa Multa
+  livro Livro [not null]
+  membro Membro [not null]
+
+  indexes {
+    (id, idLivro) [unique]
+  }
+}
+
+Ref: Livro.idEditora > Editora.id
+
+Ref: Livro.idCategoria > Categoria.id
+
+Ref: Livro.idAutor > Autor.id
+
+Ref: Funcionario.idUsuario > Usuario.id
+
+Ref: Aquisicao.idFuncionario > Funcionario.id
+
+Ref: Aquisicao.idLivro > Livro.id
+
+Ref: Membro.idUsuario > Usuario.id
+
+Ref: Emprestimo.idFuncEmp > Funcionario.id
+
+Ref: Emprestimo.idMulta > Multa.id
+
+Ref: Emprestimo.idLivro > Livro.id
+
+Ref: Emprestimo.idMembro > Membro.id

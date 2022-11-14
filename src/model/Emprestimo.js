@@ -6,7 +6,6 @@ const prisma_1 = require("../prisma");
 function operacoesEmprestimo() {
     routes_1.routes.post("/emprestimo/registrar", async (req, res) => {
         const data = req.body;
-        console.log(data);
         try {
             const emprestimo = await prisma_1.prisma.emprestimo.create({
                 data: {
@@ -45,7 +44,6 @@ function operacoesEmprestimo() {
         });
     }
     routes_1.routes.get("/emprestimo/lista", async (req, res) => {
-        console.log(req);
         try {
             const getEmprestimos = await prisma_1.prisma.emprestimo.findMany({
                 include: {
